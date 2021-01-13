@@ -1,0 +1,89 @@
+{% load boards_extras %}
+
+<div class="topic-container" data-number="{{ topic.post_number }}">
+    <h3 class="topic-subject">{{ topic.subject }}</h3>
+    <a name="{{ topic.post_number }}" class="post-number">>>{{ topic.post_number }}</a>
+    <div id="{{ topic.post_number }}-form" class="reply-form-container" data-number="{{ topic.post_number }}">
+        {% include 'form.html' with form=topic_reply_form submit_text="Submit your reply" %}
+    </div>
+    <a name="{{ topic.post_number }}-open-delete-form" class="open-delete-form" data-number="{{ topic.post_number }}">[Delete]</a>
+    <div id="{{ topic.post_number }}-delete-form" class="delete-form-container" data-number="{{ topic.post_number }}">
+        {% include 'form.html' with form=topic_delete_form submit_text="Delete this post" %}
+    </div>
+    {% if request.user.is_staff %}
+        <a name="{{ topic.post_number }}-open-ban-form" class="open-ban-form" data-number="{{ topic.post_number }}">[Ban]</a>
+        <div id="{{ topic.post_number }}-ban-form" class="ban-form-container" data-number="{{ topic.post_number }}">
+            {% include 'form.html' with form=topic_ban_form submit_text="Ban this user" %}
+        </div>
+    {% endif %}
+    {% include "identification.html" with post=topic %}
+    <p>
+        Posted at: <a class="timestamp">{{ topic.posted | date:"c" }}</a>
+    </p>
+    {% include "thumbnail.html" with post=topic %}
+    <p>
+        {% autoescape off %}
+            {{ topic.contents | escape | urlize | make_links:topic.on_board | linebreaks }}
+        {% endautoescape %}
+    </p>
+    
+    {% if mentioned_in|length > 0 %}
+        <div class="mentions-container">
+            <p>
+                Replies:
+                {% for mention in mentioned_in %}
+                    {% autoescape off %}
+                        {{ mention.post_number | convert_number_to_link:mention.on_board }}
+                    {% endautoescape %}
+                {% endfor %}
+            </p>
+        </div>
+    {% endif %}
+       
+
+    {% if open_topic_link == 1 %}
+        <a href="{% url 'topic_url' board.name topic.post_number %}">Go to this topic.</a>
+    {% endif %}
+
+    {% for reply_with_forms in replies_forms %}
+        <div class="reply-container">
+            <a name="{{ reply_with_forms.0.post_number }}" class="post-number">>>{{ reply_with_forms.0.post_number }}</a>
+            <div id="{{ reply_with_forms.0.post_number }}-form" class="reply-form-container" data-number="{{ reply_with_forms.0.post_number }}">
+                {% include 'form.html' with form=reply_with_forms.1 submit_text="Submit your reply" %}
+            </div>
+            <a name="{{ reply_with_forms.0.post_number }}-open-delete-form" class="open-delete-form" data-number="{{ reply_with_forms.0.post_number }}">[Delete]</a>
+            <div id="{{ reply_with_forms.0.post_number }}-delete-form" class="delete-form-container" data-number="{{ reply_with_forms.0.post_number }}">
+                {% include 'form.html' with form=reply_with_forms.2 submit_text="Delete this post" %}
+            </div>
+            {% if request.user.is_staff %}
+                <a name="{{ reply_with_forms.0.post_number }}-open-ban-form" class="open-ban-form" data-number="{{ reply_with_forms.0.post_number }}">[Ban]</a>
+                <div id="{{ reply_with_forms.0.post_number }}-ban-form" class="ban-form-container" data-number="{{ reply_with_forms.0.post_number }}">
+                    {% include 'form.html' with form=reply_with_forms.3 submit_text="Ban this user" %}
+                </div>
+            {% endif %}
+            {% include "identification.html" with post=reply_with_forms.0 %}
+            <p>
+                Posted at: <a class="timestamp">{{ reply_with_forms.0.posted | date:"c" }}</a>
+            </p>
+            {% include "thumbnail.html" with post=reply_with_forms.0 %}
+            <p>
+                {% autoescape off %}
+                    {{ reply_with_forms.0.contents | escape | urlize | make_links:topic.on_board | linebreaks }}</p>
+                {% endautoescape %}
+            </p>
+
+            {% if reply_with_forms.4|length > 0 %}
+                <div class="mentions-container">
+                    <p>
+                        Replies:
+                        {% for mention in reply_with_forms.4 %}
+                            {% autoescape off %}
+                                {{ mention.post_number | convert_number_to_link:topic.on_board }}
+                            {% endautoescape %}
+                        {% endfor %}
+                    </p>
+                </div>
+            {% endif %}    
+        </div>
+    {% endfor %}
+</div>

@@ -1,0 +1,5 @@
+my_site/settings.py
+my_site.ini
+static
+media
+**/__pycache__

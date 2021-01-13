@@ -1,0 +1,20 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset='utf-8' content='utf-8'>
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    </head>
+
+    <body>
+        {% if request.user.is_authenticated %}
+            <p>Logged in as {{ request.user.username }} </p>
+        {% endif %}
+        <h1 id="main-head">RainyChan</h1>
+        {% block content %}{% endblock %}
+        <script type="text/javascript" src="{% static 'js/global.js' %}"></script>
+    </body>
+</html>

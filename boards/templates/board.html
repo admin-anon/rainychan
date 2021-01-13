@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}/{{ board.name }}/{% endblock %}
+
+{% block content %}
+    <a href="{% url 'home_url' %}">Home</a> :: /{{ board.name }}/
+
+    <h2>/{{ board.name }}/</h2>
+
+    <p>{{ board.description }}</p>
+
+    <a href="{% url 'board_url_no_page' board.name %}">Return</a>
+
+    <div id="query-form-div">
+        <p>Search for a post: </p>
+        <form method="get">
+            <input type="text" name="query" {% if query %}value="{{ query }}"{% endif %}>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <div class="post-form-div">
+        {% include "form.html" with form=post_form submit_text="Submit your fantastic post!" %}
+    </div>
+
+    {% for topic in topics_replies_forms %}
+        {% include "topic.html" with topic=topic.0 topic_reply_form=topic.1 topic_delete_form=topic.2 topic_ban_form=topic.3 mentioned_in=topic.4 replies_forms=topic.5 open_topic_link=1 %}
+    {% endfor %}
+
+    <a href="{% url 'board_url_with_page' board.name 1 %}">First</a>
+    {% if prev > 0 %}
+        - <a href="{% url 'board_url_with_page' board.name prev %}">{{ prev }} </a>
+    {% endif %}
+    - {{ page }}
+    {% if next <= last %}
+        - <a href="{% url 'board_url_with_page board.name' next %}">{{ next }} </a>
+    {% endif %}
+    - <a href="{% url 'board_url_with_page' board.name last %}">Last</a>
+
+{% endblock %}

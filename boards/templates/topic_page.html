@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+    {% if topic.subject %}
+        {{ topic.subject }} - /{{ board.name }}/
+    {% else %}
+        Post on /{{ board.name }}/
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <a href="{% url 'home_url' %}">Home</a> :: <a href="{% url 'board_url_no_page' board.name %}">/{{ board.name }}/</a> :: >>{{ topic.post_number }}
+
+    <h2>/{{ board.name }}/</h2>
+
+    <p>{{ board.description }}</p>
+
+    {% include "topic.html" with topic=topic topic_reply_form=topic_reply_form topic_delete_form=topic_delete_form topic_ban_form=topic_ban_form mentioned_in=mentioned_in replies_forms=replies_with_forms open_topic_link=0 board=board %}
+{% endblock content %}

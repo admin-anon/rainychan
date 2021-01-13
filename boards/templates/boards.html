@@ -1,0 +1,34 @@
+{% extends 'base.html'%}
+
+{% load static %}
+
+{% block title %}Welcome to RainyChan!{% endblock %}
+
+{% block content %}
+    <h2>Welcome to RainyChan!</h2>
+
+    <p>This is an imageboard mainly about depression and mental illness, but feel free to talk about anything that interests or bugs you.</p>
+
+    <p>
+    Rules:<br>
+    1. No NSFW images or links.<br>
+    2. No spamming.<br>
+    </p>
+
+    <p>Here are our boards:</p>
+
+    <table id="boards-table">
+        <tr>
+            <td>Board</td>
+            <td>Description</td>
+            <td>Top post</td>
+        </tr>
+        {% for board_top_post in boards_top_posts %}
+            <tr>
+                <td><a href="{% url 'board_url_no_page' board_top_post.0.name %}">/{{ board_top_post.0.name }}/</a></td>
+                <td>{{ board_top_post.0.description }}</td>
+                <td>{{ board_top_post.1 }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

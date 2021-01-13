@@ -1,0 +1,15 @@
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+    <table class="form-table">
+        {% for field in form.visible_fields %}
+            <tr>
+                <td><b style="color: red">{{ field.errors }}</b> {{ field.label_tag }}</td>
+                <td>{{ field }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <button type="submit">{{ submit_text }}</button>
+</form>

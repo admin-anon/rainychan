@@ -1,0 +1,7 @@
+{% if post.by_user %}
+    <p class="registered-user">{{ post.by_user.username }} (Registered) {% if post.by_user.is_staff %}(Staff){% endif %}</p>
+{% elif post.tripcode %}
+    <p class="tripcode">{{ post.tripcode }}</p>
+{% else %}
+    <p class="anon">Anon</p>
+{% endif %}
