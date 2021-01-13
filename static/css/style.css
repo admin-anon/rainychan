@@ -1,0 +1,89 @@
+body {
+    background-color: #10566c;
+    color: #c2efdd;
+    border-color: #c2efdd;
+}
+
+#main-head { 
+    text-align: center;
+}
+
+#boards-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#boards-table td {
+    border: solid;
+    border-width: 2px;
+    padding: 3px;
+    background-color: #082b36;
+}
+
+.form-table {
+    border-collapse: collapse;
+    margin: 2px;
+    background-color: #082b36;
+}
+
+.form-table td {
+    border: solid;
+    border-width: 2px;
+    padding: 2px;
+}
+
+a {
+    color: red;
+}
+
+.topic-container {
+    border: solid;
+    border-width: 2px;
+    padding: 5px;
+    margin: 10px;
+    background-color: #082b36;
+}
+
+.reply-container {
+    border: solid;
+    border-width: 2px;
+    padding: 5px;
+    margin: 5px;
+    background-color: #082b36;
+}
+
+.reply-form-container {
+    visibility: hidden;
+    display: none;
+}
+
+.delete-form-container {
+    visibility: hidden;
+    display: none;
+}
+
+.secret-field-wrapper {
+    visibility: hidden;
+    display: none;
+}
+
+.registered-user {
+    color: white;
+}
+
+.ban-form-container {
+    visibility: hidden;
+    display: none;
+}
+
+#query-form-div {
+    display: inline;
+    margin: 10px;
+}
+
+.mentions-container {
+    border-top: solid;
+    border-width: inherit;
+    padding: 2px;
+    font-size: 9pt;
+}
