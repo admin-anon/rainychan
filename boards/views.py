@@ -5,6 +5,7 @@ from django.http import HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404, reverse, redirect
 from .models import Board, Post, Topic, Reply, BannedIP
 from .forms import TopicForm, ReplyForm, DeletionForm, BanForm
+from django.template import RequestContext
 
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -382,3 +383,13 @@ def topic_view(request, board_name, post_number):
 
 def banned_view(request):
     return render(request, 'banned.html')
+
+def handler404(request, *args, **kwargs):
+    response = render(request, '404.html')
+    response.status_code = 404
+    return response
+
+def handler500(request, *args, **kwargs):
+    response = render(request, '500.html')
+    response.status_code = 500
+    return response
