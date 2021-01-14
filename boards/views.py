@@ -1,7 +1,7 @@
 import collections, math, hashlib, operator
 from PIL import Image
 
-from django.http import Http404
+from django.http import HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404, reverse, redirect
 from .models import Board, Post, Topic, Reply, BannedIP
 from .forms import TopicForm, ReplyForm, DeletionForm, BanForm
@@ -163,7 +163,7 @@ def board_view(request, board_name, page):
             all_topics = new_all_topics
 
     if len(all_topics) / posts_per_page <= page - 1 and page != 1:
-        return Http404()
+        return HttpResponseNotFound()
 
     posts_to_display = all_topics[(page - 1) * posts_per_page:page * posts_per_page]
 
@@ -174,12 +174,15 @@ def board_view(request, board_name, page):
 
     reply_forms = {}
     delete_forms = {}
+    ban_forms = {}
     for topic, replies in topics_with_replies:
         reply_forms[topic.post_number] = ReplyForm()
         delete_forms[topic.post_number] = DeletionForm()
+        ban_forms[topic.post_number] = BanForm()
         for reply in replies:
             reply_forms[reply.post_number] = ReplyForm()
             delete_forms[reply.post_number] = DeletionForm()
+            ban_forms[reply.post_number] = BanForm()
 
     post_form = TopicForm()
 
@@ -220,8 +223,20 @@ def board_view(request, board_name, page):
                 m = make_reply(new_reply_form, request, board)
 
                 return redirect(reverse(topic_view, args=[board_name, m.on_topic.post_number]) + '#' + str(m.post_number))
-            
-            reply_forms[new_reply_form.cleaned_data['post_number']] = new_reply_form
+            else:
+                if 'post_number' in new_reply_form.cleaned_data:
+                    reply_forms[new_reply_form.cleaned_data['post_number']] = new_reply_form
+                    this_reply_set = Reply.objects.filter(post_number=new_reply_form.cleaned_data['post_number'])
+                    this_topic_set = Topic.objects.filter(post_number=new_reply_form.cleaned_data['post_number'])
+                    if len(this_reply_set) == 1:
+                        for i, (topic, replies) in enumerate(topics_with_replies):
+                            if topic == this_reply_set[0].on_topic:
+                                if this_reply_set[0] not in replies:
+                                    topics_with_replies[i][1].insert(0, this_reply_set[0])
+                    if len(this_topic_set) == 0:
+                        return HttpResponseNotFound()
+                else:
+                    return HttpResponseNotFound()
         elif 'deleteform_identifier' in request.POST:
             new_deletion_form = DeletionForm(request.POST)
 
@@ -233,8 +248,20 @@ def board_view(request, board_name, page):
                 else:
                     new_deletion_form.add_error('password', 'Incorrect password')
                     delete_forms[new_deletion_form.cleaned_data['post_number']] = new_deletion_form
-            
-            delete_forms[new_deletion_form.cleaned_data['post_number']] = new_deletion_form
+            else:
+                if 'post_number' in new_deletion_form.cleaned_data:
+                    delete_forms[new_deletion_form.cleaned_data['post_number']] = new_deletion_form
+                    this_reply_set = Reply.objects.filter(post_number=new_deletion_form.cleaned_data['post_number'])
+                    this_topic_set = Topic.objects.filter(post_number=new_deletion_form.cleaned_data['post_number'])
+                    if len(this_reply_set) == 1:
+                        for i, (topic, replies) in enumerate(topics_with_replies):
+                            if topic == this_reply_set[0].on_topic:
+                                if this_reply_set[0] not in replies:
+                                    topics_with_replies[i][1].insert(0, this_reply_set[0])
+                    if len(this_topic_set) == 0:
+                        return HttpResponseNotFound()
+                else:
+                    return HttpResponseNotFound()
         elif 'banform_identifier' in request.POST:
             new_ban_form = BanForm(request.POST)
 
@@ -242,14 +269,28 @@ def board_view(request, board_name, page):
                 success = try_ban(request, board, new_ban_form)
 
                 if not success:
-                    return Http404()
+                    return HttpResponseNotFound()
+            else:
+                if 'post_number' in new_ban_form.cleaned_data:
+                    ban_forms[new_ban_form.cleaned_data['post_number']] = new_ban_form
+                    this_reply_set = Reply.objects.filter(post_number=new_ban_form.cleaned_data['post_number'])
+                    this_topic_set = Topic.objects.filter(post_number=new_ban_form.cleaned_data['post_number'])
+                    if len(this_reply_set) == 1:
+                        for i, (topic, replies) in enumerate(topics_with_replies):
+                            if topic == this_reply_set[0].on_topic:
+                                if this_reply_set[0] not in replies:
+                                    topics_with_replies[i][1].insert(0, this_reply_set[0])
+                    if len(this_topic_set) == 0:
+                        return HttpResponseNotFound()                
+                else:
+                    return HttpResponseNotFound()
 
     topics_replies_forms = []
     for topic, replies in topics_with_replies:
         replies_with_forms = []
         for reply in replies:
-            replies_with_forms.append((reply, reply_forms[reply.post_number], delete_forms[reply.post_number], BanForm(), get_replies(reply)))
-        topics_replies_forms.append((topic, reply_forms[topic.post_number], delete_forms[topic.post_number], BanForm(), get_replies(topic), replies_with_forms))
+            replies_with_forms.append((reply, reply_forms[reply.post_number], delete_forms[reply.post_number], ban_forms[reply.post_number], get_replies(reply)))
+        topics_replies_forms.append((topic, reply_forms[topic.post_number], delete_forms[topic.post_number], ban_forms[topic.post_number], get_replies(topic), replies_with_forms))
 
     last = max(1, math.ceil(len(all_topics) / posts_per_page))
     return render(request, 'board.html', {'board': board, 'topics_replies_forms': topics_replies_forms, 'post_form': post_form, 'page': page, 'prev': page - 1, 'next': page + 1, 'last': last, 'query': query})
@@ -264,16 +305,15 @@ def topic_view(request, board_name, post_number):
     board = get_object_or_404(Board, name=board_name)
     topic = get_object_or_404(Topic, on_board=board, post_number=post_number)
 
-    topic_reply_form = ReplyForm()
-    topic_delete_form = DeletionForm()
-
     replies = Reply.objects.filter(on_topic=topic).order_by('post_number')
 
-    reply_forms = {}
-    delete_forms = {}
+    reply_forms = {topic.post_number: ReplyForm()}
+    delete_forms = {topic.post_number: DeletionForm()}
+    ban_forms = {topic.post_number: BanForm()}
     for reply in replies:
         reply_forms[reply.post_number] = ReplyForm()
         delete_forms[reply.post_number] = DeletionForm()
+        ban_forms[reply.post_number] = BanForm()
 
     if request.method == 'POST':
         if 'replyform_identifier' in request.POST:
@@ -283,8 +323,11 @@ def topic_view(request, board_name, post_number):
                 m = make_reply(new_reply_form, request, board)
 
                 return redirect(reverse(topic_view, args=[board_name, m.on_topic.post_number]) + '#' + str(m.post_number))
-            
-            reply_forms[new_reply_form.cleaned_data['post_number']] = new_reply_form
+            else:
+                if 'post_number' in new_reply_form.cleaned_data:
+                    reply_forms[new_reply_form.cleaned_data['post_number']] = new_reply_form
+                else:
+                    return HttpResponseNotFound()
         elif 'deleteform_identifier' in request.POST:
             new_deletion_form = DeletionForm(request.POST)
 
@@ -299,8 +342,11 @@ def topic_view(request, board_name, post_number):
                 else:
                     new_deletion_form.add_error('password', 'Incorrect password')
                     delete_forms[new_deletion_form.cleaned_data['post_number']] = new_deletion_form
-
-            delete_forms[new_deletion_form.cleaned_data['post_number']] = new_deletion_form
+            else:
+                if 'post_number' in new_deletion_form.cleaned_data:
+                    delete_forms[new_deletion_form.cleaned_data['post_number']] = new_deletion_form
+                else:
+                    return HttpResponseNotFound()
         elif 'banform_identifier' in request.POST:
             new_ban_form = BanForm(request.POST)
 
@@ -308,16 +354,21 @@ def topic_view(request, board_name, post_number):
                 success = try_ban(request, board, new_ban_form)
 
                 if not success:
-                    return Http404()
+                    return HttpResponseNotFound()
                 
                 if success and new_ban_form.cleaned_data['post_number'] == topic.post_number:
                     return redirect(reverse(board_view_no_page, args=[board.name]))
+            else:
+                if 'post_number' in new_ban_form.cleaned_data:
+                    ban_forms[new_ban_form.cleaned_data['post_number']] = new_ban_form
+                else:
+                    return HttpResponseNotFound()
 
     replies_with_forms = []
     for reply in replies:
-        replies_with_forms.append((reply, reply_forms[reply.post_number], delete_forms[reply.post_number], BanForm(), get_replies(reply)))
+        replies_with_forms.append((reply, reply_forms[reply.post_number], delete_forms[reply.post_number], ban_forms[reply.post_number], get_replies(reply)))
     
-    return render(request, 'topic_page.html', {'board': board, 'topic': topic, 'topic_reply_form': topic_reply_form, 'topic_delete_form': topic_delete_form, 'topic_ban_form': BanForm(), 'mentioned_in': get_replies(topic), 'replies_with_forms': replies_with_forms})
+    return render(request, 'topic_page.html', {'board': board, 'topic': topic, 'topic_reply_form': reply_forms[topic.post_number], 'topic_delete_form': delete_forms[topic.post_number], 'topic_ban_form': ban_forms[topic.post_number], 'mentioned_in': get_replies(topic), 'replies_with_forms': replies_with_forms})
 
 def banned_view(request):
     return render(request, 'banned.html')

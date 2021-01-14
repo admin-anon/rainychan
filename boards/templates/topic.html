@@ -4,16 +4,16 @@
     <h3 class="topic-subject">{{ topic.subject }}</h3>
     <a name="{{ topic.post_number }}" class="post-number">>>{{ topic.post_number }}</a>
     <div id="{{ topic.post_number }}-form" class="reply-form-container" data-number="{{ topic.post_number }}">
-        {% include 'form.html' with form=topic_reply_form submit_text="Submit your reply" %}
+        {% include 'form.html' with form=topic_reply_form submit_text="Submit your reply" post_number=topic.post_number %}
     </div>
     <a name="{{ topic.post_number }}-open-delete-form" class="open-delete-form" data-number="{{ topic.post_number }}">[Delete]</a>
     <div id="{{ topic.post_number }}-delete-form" class="delete-form-container" data-number="{{ topic.post_number }}">
-        {% include 'form.html' with form=topic_delete_form submit_text="Delete this post" %}
+        {% include 'form.html' with form=topic_delete_form submit_text="Delete this post" post_number=topic.post_number %}
     </div>
     {% if request.user.is_staff %}
         <a name="{{ topic.post_number }}-open-ban-form" class="open-ban-form" data-number="{{ topic.post_number }}">[Ban]</a>
         <div id="{{ topic.post_number }}-ban-form" class="ban-form-container" data-number="{{ topic.post_number }}">
-            {% include 'form.html' with form=topic_ban_form submit_text="Ban this user" %}
+            {% include 'form.html' with form=topic_ban_form submit_text="Ban this user" post_number=topic.post_number %}
         </div>
     {% endif %}
     {% include "identification.html" with post=topic %}
@@ -49,16 +49,16 @@
         <div class="reply-container">
             <a name="{{ reply_with_forms.0.post_number }}" class="post-number">>>{{ reply_with_forms.0.post_number }}</a>
             <div id="{{ reply_with_forms.0.post_number }}-form" class="reply-form-container" data-number="{{ reply_with_forms.0.post_number }}">
-                {% include 'form.html' with form=reply_with_forms.1 submit_text="Submit your reply" %}
+                {% include 'form.html' with form=reply_with_forms.1 submit_text="Submit your reply" post_number=reply_with_forms.0.post_number %}
             </div>
             <a name="{{ reply_with_forms.0.post_number }}-open-delete-form" class="open-delete-form" data-number="{{ reply_with_forms.0.post_number }}">[Delete]</a>
             <div id="{{ reply_with_forms.0.post_number }}-delete-form" class="delete-form-container" data-number="{{ reply_with_forms.0.post_number }}">
-                {% include 'form.html' with form=reply_with_forms.2 submit_text="Delete this post" %}
+                {% include 'form.html' with form=reply_with_forms.2 submit_text="Delete this post" post_number=reply_with_forms.0.post_number %}
             </div>
             {% if request.user.is_staff %}
                 <a name="{{ reply_with_forms.0.post_number }}-open-ban-form" class="open-ban-form" data-number="{{ reply_with_forms.0.post_number }}">[Ban]</a>
                 <div id="{{ reply_with_forms.0.post_number }}-ban-form" class="ban-form-container" data-number="{{ reply_with_forms.0.post_number }}">
-                    {% include 'form.html' with form=reply_with_forms.3 submit_text="Ban this user" %}
+                    {% include 'form.html' with form=reply_with_forms.3 submit_text="Ban this user" post_number=reply_with_forms.0.post_number %}
                 </div>
             {% endif %}
             {% include "identification.html" with post=reply_with_forms.0 %}

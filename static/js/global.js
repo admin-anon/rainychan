@@ -24,7 +24,15 @@ const reply_form_divs = document.getElementsByClassName("reply-form-container");
 
 Array.prototype.slice.call(reply_form_divs).forEach(form_div => {
     const textarea = form_div.getElementsByClassName("post-form")[0];
-    textarea.value = ">>" + form_div.dataset.number;
+    if (textarea.value == "") {
+        textarea.value = ">>" + form_div.dataset.number;
+    }
+    
+    const errors = form_div.getElementsByClassName("field-errors");
+    if (errors.length > 0) {
+        form_div.style.visibility = "visible";
+        form_div.style.display = "block";
+    }
 });
 
 const post_numbers = document.getElementsByClassName("post-number");

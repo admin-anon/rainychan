@@ -29,4 +29,5 @@ class DeletionForm(forms.Form):
 
 class BanForm(forms.Form):
     banform_identifier = forms.BooleanField(widget=forms.HiddenInput(), initial=True)
+    captcha_field = CaptchaField()
     post_number = forms.IntegerField(widget=forms.HiddenInput(attrs={'class': 'ban-form'}))

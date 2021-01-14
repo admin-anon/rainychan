@@ -23,22 +23,6 @@ class Post(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
-        topics = Topic.objects.order_by('-posted').filter(on_board=self.on_board)
-        replies = Reply.objects.order_by('-posted').filter(on_board=self.on_board)
-
-        if topics.count() == 0:
-            self.post_number = 1
-        elif replies.count() == 0:
-            self.post_number = topics[0].post_number + 1
-        else:
-            if topics[0].post_number > replies[0].post_number:
-                self.post_number = topics[0].post_number + 1
-            elif topics[0].post_number == replies[0].post_number:
-                replies[0].delete()
-                self.post_number = topics[0].post_number + 1
-            else:
-                self.post_number = replies[0].post_number + 1
-
         self.post_number = Topic.objects.filter(on_board=self.on_board).count() + Reply.objects.filter(on_board=self.on_board).count()
 
         if self.attachment:
