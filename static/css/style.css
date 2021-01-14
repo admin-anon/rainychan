@@ -30,10 +30,12 @@ td {
 
 #boards-table td {
     width: 33%;
+    height: 3em;
 }
 
 #recent-posts-table td {
     width: 33%;
+    height: 3em;
 }
 
 

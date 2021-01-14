@@ -70,6 +70,6 @@ def is_topic(value):
 @register.filter
 @stringfilter
 def shorten(value):
-    if len(value) > 100:
-        return value[:100] + "..."
+    if len(value) > 60:
+        return value[:60] + "..."
     return value

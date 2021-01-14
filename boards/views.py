@@ -140,8 +140,8 @@ def main_view(request):
         shortened = ""
         if len(topics) > 0:
             shortened = topics[0].contents
-            if len(shortened) > 100:
-                shortened = shortened[:100] + "..."
+            if len(shortened) > 60:
+                shortened = shortened[:60] + "..."
         boards_top_posts.append((board, shortened))
     
     recent_posts = sorted(list(Topic.objects.all()) + list(Reply.objects.all()), key=operator.attrgetter('posted'))
