@@ -90,12 +90,16 @@ def try_ban(request, board, new_ban_form):
         replies = Reply.objects.filter(on_board=board, post_number=post_number)
 
         if topics.count() == 1:
-            BannedIP(ip=topics[0].from_ip).save()
-            topics[0].delete()
+            topic = topics[0]
+            BannedIP(ip=topic.from_ip).save()
+            topic.banned_for = True
+            topic.save_mod()
             return True
         elif replies.count() == 1:
-            BannedIP(ip=replies[0].from_ip).save()
-            replies[0].delete()
+            reply = replies[0]
+            BannedIP(ip=reply.from_ip).save()
+            reply.banned_for = True
+            reply.save_mod()
             return True
 
     return False
@@ -229,10 +233,12 @@ def board_view(request, board_name, page):
                     this_reply_set = Reply.objects.filter(post_number=new_reply_form.cleaned_data['post_number'])
                     this_topic_set = Topic.objects.filter(post_number=new_reply_form.cleaned_data['post_number'])
                     if len(this_reply_set) == 1:
+                        this_reply = this_reply_set[0]
                         for i, (topic, replies) in enumerate(topics_with_replies):
-                            if topic == this_reply_set[0].on_topic:
-                                if this_reply_set[0] not in replies:
-                                    topics_with_replies[i][1].insert(0, this_reply_set[0])
+                            if topic == this_reply.on_topic:
+                                if this_reply not in replies:
+                                    topics_with_replies[i][1].insert(0, this_reply)
+                                    break
                     if len(this_topic_set) == 0:
                         return HttpResponseNotFound()
                 else:
@@ -240,6 +246,7 @@ def board_view(request, board_name, page):
         elif 'deleteform_identifier' in request.POST:
             new_deletion_form = DeletionForm(request.POST)
 
+            success = False
             if new_deletion_form.is_valid():
                 success = try_delete(request, board, new_deletion_form)
 
@@ -247,41 +254,44 @@ def board_view(request, board_name, page):
                     return redirect(reverse(board_view, args=[board_name, page]))
                 else:
                     new_deletion_form.add_error('password', 'Incorrect password')
-                    delete_forms[new_deletion_form.cleaned_data['post_number']] = new_deletion_form
-            else:
+
+            if not success:
                 if 'post_number' in new_deletion_form.cleaned_data:
                     delete_forms[new_deletion_form.cleaned_data['post_number']] = new_deletion_form
                     this_reply_set = Reply.objects.filter(post_number=new_deletion_form.cleaned_data['post_number'])
                     this_topic_set = Topic.objects.filter(post_number=new_deletion_form.cleaned_data['post_number'])
                     if len(this_reply_set) == 1:
+                        this_reply = this_reply_set[0]
                         for i, (topic, replies) in enumerate(topics_with_replies):
-                            if topic == this_reply_set[0].on_topic:
-                                if this_reply_set[0] not in replies:
-                                    topics_with_replies[i][1].insert(0, this_reply_set[0])
-                    if len(this_topic_set) == 0:
+                            if topic == this_reply.on_topic:
+                                if this_reply not in replies:
+                                    topics_with_replies[i][1].insert(0, this_reply)
+                                    break
+                    elif len(this_topic_set) == 0:
                         return HttpResponseNotFound()
                 else:
                     return HttpResponseNotFound()
         elif 'banform_identifier' in request.POST:
             new_ban_form = BanForm(request.POST)
 
+            success = False
             if new_ban_form.is_valid():
                 success = try_ban(request, board, new_ban_form)
-
-                if not success:
-                    return HttpResponseNotFound()
-            else:
+            
+            if not success:
                 if 'post_number' in new_ban_form.cleaned_data:
                     ban_forms[new_ban_form.cleaned_data['post_number']] = new_ban_form
                     this_reply_set = Reply.objects.filter(post_number=new_ban_form.cleaned_data['post_number'])
                     this_topic_set = Topic.objects.filter(post_number=new_ban_form.cleaned_data['post_number'])
                     if len(this_reply_set) == 1:
+                        this_reply = this_reply_set[0]
                         for i, (topic, replies) in enumerate(topics_with_replies):
-                            if topic == this_reply_set[0].on_topic:
-                                if this_reply_set[0] not in replies:
-                                    topics_with_replies[i][1].insert(0, this_reply_set[0])
-                    if len(this_topic_set) == 0:
-                        return HttpResponseNotFound()                
+                            if topic == this_reply.on_topic:
+                                if this_reply not in replies:
+                                    topics_with_replies[i][1].insert(0, this_reply)
+                                    break
+                    elif len(this_topic_set) == 0:
+                        return HttpResponseNotFound()
                 else:
                     return HttpResponseNotFound()
 
@@ -348,7 +358,7 @@ def topic_view(request, board_name, post_number):
                 else:
                     return HttpResponseNotFound()
         elif 'banform_identifier' in request.POST:
-            new_ban_form = BanForm(request.POST)
+            new_ban_form = BanForm(request.POST, request.FILES)
 
             if new_ban_form.is_valid():
                 success = try_ban(request, board, new_ban_form)

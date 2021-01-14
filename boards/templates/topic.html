@@ -10,11 +10,14 @@
     <div id="{{ topic.post_number }}-delete-form" class="delete-form-container" data-number="{{ topic.post_number }}">
         {% include 'form.html' with form=topic_delete_form submit_text="Delete this post" post_number=topic.post_number %}
     </div>
-    {% if request.user.is_staff %}
+    {% if request.user.is_staff  and not topic.banned_for %}
         <a name="{{ topic.post_number }}-open-ban-form" class="open-ban-form" data-number="{{ topic.post_number }}">[Ban]</a>
         <div id="{{ topic.post_number }}-ban-form" class="ban-form-container" data-number="{{ topic.post_number }}">
             {% include 'form.html' with form=topic_ban_form submit_text="Ban this user" post_number=topic.post_number %}
         </div>
+    {% endif %}
+    {% if topic.banned_for %}
+        <br><b style="color: red">User was banned for this post.</b>
     {% endif %}
     {% include "identification.html" with post=topic %}
     <p>
@@ -55,11 +58,14 @@
             <div id="{{ reply_with_forms.0.post_number }}-delete-form" class="delete-form-container" data-number="{{ reply_with_forms.0.post_number }}">
                 {% include 'form.html' with form=reply_with_forms.2 submit_text="Delete this post" post_number=reply_with_forms.0.post_number %}
             </div>
-            {% if request.user.is_staff %}
+            {% if request.user.is_staff and not reply_with_forms.0.banned_for %}
                 <a name="{{ reply_with_forms.0.post_number }}-open-ban-form" class="open-ban-form" data-number="{{ reply_with_forms.0.post_number }}">[Ban]</a>
                 <div id="{{ reply_with_forms.0.post_number }}-ban-form" class="ban-form-container" data-number="{{ reply_with_forms.0.post_number }}">
                     {% include 'form.html' with form=reply_with_forms.3 submit_text="Ban this user" post_number=reply_with_forms.0.post_number %}
                 </div>
+            {% endif %}
+            {% if reply_with_forms.0.banned_for %}
+                <br><b style="color: red">User was banned for this post.</b>
             {% endif %}
             {% include "identification.html" with post=reply_with_forms.0 %}
             <p>

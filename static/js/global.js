@@ -35,6 +35,26 @@ Array.prototype.slice.call(reply_form_divs).forEach(form_div => {
     }
 });
 
+const delete_form_divs = document.getElementsByClassName("delete-form-container");
+
+Array.prototype.slice.call(delete_form_divs).forEach(form_div => {
+    const errors = form_div.getElementsByClassName("field-errors");
+    if (errors.length > 0) {
+        form_div.style.visibility = "visible";
+        form_div.style.display = "block";
+    }
+});
+
+const ban_form_divs = document.getElementsByClassName("ban-form-container");
+
+Array.prototype.slice.call(ban_form_divs).forEach(form_div => {
+    const errors = form_div.getElementsByClassName("field-errors");
+    if (errors.length > 0) {
+        form_div.style.visibility = "visible";
+        form_div.style.display = "block";
+    }
+});
+
 const post_numbers = document.getElementsByClassName("post-number");
 
 Array.prototype.slice.call(post_numbers).forEach(post_number => {
@@ -128,7 +148,7 @@ if (readCookie('password') == null) {
     var exclamationCharCode = "!".charCodeAt(0);
     var tildeCharCode = "~".charCodeAt(0);
     for (var i = 0; i < 10; i++) {
-        password += String.fromCharCode(exclamationCharCode + Math.ceil(Math.random() * (tildeCharCode - spaceCharCode)));
+        password += String.fromCharCode(exclamationCharCode + Math.ceil(Math.random() * (tildeCharCode - exclamationCharCode)));
     }
 
     createCookie('password', password, 1);

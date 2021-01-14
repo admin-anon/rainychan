@@ -18,12 +18,17 @@ class Post(models.Model):
     post_number = models.IntegerField()
     from_ip = models.GenericIPAddressField()
     password_hash = models.CharField(blank=True, max_length=128)
+    banned_for = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
 
     def save(self, *args, **kwargs):
-        self.post_number = Topic.objects.filter(on_board=self.on_board).count() + Reply.objects.filter(on_board=self.on_board).count()
+        posts = list(Topic.objects.filter(on_board=self.on_board)) + list(Reply.objects.filter(on_board=self.on_board))
+        if len(posts) == 0:
+            self.post_number = 1
+        else:
+            self.post_number = max([post.post_number for post in posts]) + 1
 
         if self.attachment:
             image = Image.open(self.attachment).convert('RGB')
@@ -36,6 +41,9 @@ class Post(models.Model):
             thumbnail.save(thumb_io, format='JPEG', quality=85)
             self.thumbnail = File(thumb_io, name=self.attachment.name + '.thumbnail.jpeg')
         
+        super().save(*args, **kwargs)
+    
+    def save_mod(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
 class Topic(Post):
