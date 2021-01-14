@@ -143,8 +143,11 @@ def main_view(request):
             if len(shortened) > 100:
                 shortened = shortened[:100] + "..."
         boards_top_posts.append((board, shortened))
+    
+    recent_posts = sorted(list(Topic.objects.all()) + list(Reply.objects.all()), key=operator.attrgetter('posted'))
+    recent_posts.reverse()
 
-    return render(request, 'boards.html', {'boards_top_posts': boards_top_posts})
+    return render(request, 'boards.html', {'boards_top_posts': boards_top_posts, 'recent_posts': recent_posts[:20]})
 
 def board_view(request, board_name, page):
     if is_banned(request) and not request.user.is_staff:

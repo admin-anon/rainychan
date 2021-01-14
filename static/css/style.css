@@ -13,23 +13,33 @@ body {
     border-collapse: collapse;
 }
 
-#boards-table td {
-    border: solid;
-    border-width: 2px;
-    padding: 3px;
+table {
     background-color: #082b36;
 }
+
+td {
+    border: solid;
+    border-width: 2px;
+    padding: 2px;
+}
+
+#recent-posts-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#boards-table td {
+    width: 33%;
+}
+
+#recent-posts-table td {
+    width: 33%;
+}
+
 
 .form-table {
     border-collapse: collapse;
     margin: 2px;
-    background-color: #082b36;
-}
-
-.form-table td {
-    border: solid;
-    border-width: 2px;
-    padding: 2px;
 }
 
 a {

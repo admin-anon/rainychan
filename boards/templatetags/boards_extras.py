@@ -59,3 +59,17 @@ def make_links(value, board):
 @register.filter
 def convert_number_to_link(value, board):
     return make_links('&gt;&gt;' + str(value), board)
+
+@register.filter
+def is_topic(value):
+    if isinstance(value, models.Topic):
+        return True
+
+    return False
+
+@register.filter
+@stringfilter
+def shorten(value):
+    if len(value) > 100:
+        return value[:100] + "..."
+    return value

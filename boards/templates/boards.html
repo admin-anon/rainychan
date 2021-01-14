@@ -2,6 +2,8 @@
 
 {% load static %}
 
+{% load boards_extras %}
+
 {% block title %}Welcome to RainyChan!{% endblock %}
 
 {% block content %}
@@ -28,6 +30,24 @@
                 <td><a href="{% url 'board_url_no_page' board_top_post.0.name %}">/{{ board_top_post.0.name }}/</a></td>
                 <td>{{ board_top_post.0.description }}</td>
                 <td>{{ board_top_post.1 }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <p>Recent posts:</p>
+
+    <table id="recent-posts-table">
+        {% for post in recent_posts %}
+            <tr>  
+                <td>
+                    <a href="{% url 'board_url_no_page' post.on_board.name %}">/{{ post.on_board.name }}/</a>
+                </td>
+                <td>
+                    <a href={% if post|is_topic %}"{% url 'topic_url' post.on_board.name post.post_number %}"{% else %}"{% url 'topic_url' post.on_board.name post.on_topic.post_number %}#{{ post.post_number }}"{% endif %}>>>{{ post.post_number }}</a>
+                </td>
+                <td>
+                    {{ post.contents|shorten }}
+                </td>
             </tr>
         {% endfor %}
     </table>
