@@ -1,7 +1,12 @@
+:root {
+    --div-color: #414d62;
+    --text-color: #ffffff;
+}
+
 body {
-    background-color: #10566c;
-    color: #c2efdd;
-    border-color: #c2efdd;
+    background-color: #040507;
+    color: var(--text-color);
+    border-color: var(--text-color);
 }
 
 #main-head { 
@@ -14,7 +19,7 @@ body {
 }
 
 table {
-    background-color: #082b36;
+    background-color: var(--div-color);
 }
 
 td {
@@ -45,7 +50,7 @@ td {
 }
 
 a {
-    color: red;
+    color: #64aeb3;
 }
 
 .topic-container {
@@ -53,8 +58,7 @@ a {
     border-width: 2px;
     padding: 5px;
     margin: 10px;
-    background-color: #082b36;
-    margin-bottom: 20px;
+    background-color: var(--div-color);
 }
 
 .reply-container {
@@ -62,7 +66,7 @@ a {
     border-width: 2px;
     padding: 5px;
     margin: 5px;
-    background-color: #082b36;
+    background-color: var(--div-color);
 }
 
 .reply-form-container {
@@ -81,7 +85,7 @@ a {
 }
 
 .registered-user {
-    color: white;
+    color: #f7b83d;
 }
 
 .ban-form-container {

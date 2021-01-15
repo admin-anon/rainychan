@@ -31,11 +31,8 @@ class Post(models.Model):
             self.post_number = max([post.post_number for post in posts]) + 1
 
         if self.attachment:
-            image = Image.open(self.attachment).convert('RGB')
-            width, height = image.size
-            new_width = min(width, 200)
-            new_height = int(height * new_width / width)
-            thumbnail = image.resize((new_width, new_height), Image.ANTIALIAS)
+            thumbnail = Image.open(self.attachment).convert('RGB')
+            thumbnail.thumbnail((200, 200))
 
             thumb_io = BytesIO()
             thumbnail.save(thumb_io, format='JPEG', quality=85)

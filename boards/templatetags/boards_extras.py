@@ -20,19 +20,23 @@ def make_links(value, board):
                     end += 1
                 else:
                     break
-            post_number = int(value[i + 8:end])
-            topics = models.Topic.objects.filter(on_board=board, post_number=post_number)
-            if topics.count() != 1:
-                replies = models.Reply.objects.filter(on_board=board, post_number=post_number)
-                if replies.count() != 1:
-                    out += value[i:end]
+            if end > i + 8:
+                post_number = int(value[i + 8:end])
+                topics = models.Topic.objects.filter(on_board=board, post_number=post_number)
+                if topics.count() != 1:
+                    replies = models.Reply.objects.filter(on_board=board, post_number=post_number)
+                    if replies.count() != 1:
+                        out += value[i:end]
+                    else:
+                        reply = replies[0]
+                        out += '<a href="' + reverse(views.topic_view, args=[reply.on_board.name, reply.on_topic.post_number]) + '#' + value[i + 8:end] + '">' + value[i:end] + "</a>"
                 else:
-                    reply = replies[0]
-                    out += '<a href="' + reverse(views.topic_view, args=[reply.on_board.name, reply.on_topic.post_number]) + '#' + value[i + 8:end] + '">' + value[i:end] + "</a>"
+                    topic = topics[0]
+                    out += '<a href="' + reverse(views.topic_view, args=[topic.on_board.name, topic.post_number]) + '">' + value[i:end] + "</a>"
+                i = end
             else:
-                topic = topics[0]
-                out += '<a href="' + reverse(views.topic_view, args=[topic.on_board.name, topic.post_number]) + '">' + value[i:end] + "</a>"
-            i = end
+                out += value[i]
+                i += 1
         else:
             out += value[i]
             i += 1
@@ -47,8 +51,13 @@ def make_links(value, board):
             for j in range(i + 13, len(out)):
                 if out[j] == '/':
                     end = j + 1
-            out2 += '<a href="' + reverse(views.board_view_no_page, args=[out[i + 13:end - 1]]) + '">' + out[i:end] + "</a>"
-            i = end
+            that_board_set = Board.objects.filter(name=out[i + 13:end - 1])
+            if that_board_set.count() == 1:
+                out2 += '<a href="' + reverse(views.board_view_no_page, args=[that_board_set[0].name]) + '">' + out[i:end] + "</a>"
+                i = end
+            else:
+                out2 += out[i]
+                i += 1
         else:
             out2 += out[i]
             i += 1
