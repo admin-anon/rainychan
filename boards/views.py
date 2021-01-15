@@ -282,7 +282,22 @@ def board_view(request, board_name, page):
             if new_ban_form.is_valid():
                 success = try_ban(request, board, new_ban_form)
             
-            if not success:
+            if success:
+                found = False
+
+                for i, (topic, replies) in enumerate(topics_with_replies):
+                    if new_ban_form.cleaned_data['post_number'] == topic.post_number:
+                        topics_with_replies[i][0] = get_object_or_404(Topic, pk=topic.pk)
+                        break
+                    else:
+                        for j, reply in enumerate(replies):
+                            if new_ban_form.cleaned_data['post_number'] == reply.post_number:
+                                topics_with_replies[i][1][j] = get_object_or_404(Reply, pk=reply.pk)
+                                found = True
+                                break
+                        if found:
+                            break
+            else:
                 if 'post_number' in new_ban_form.cleaned_data:
                     ban_forms[new_ban_form.cleaned_data['post_number']] = new_ban_form
                     this_reply_set = Reply.objects.filter(post_number=new_ban_form.cleaned_data['post_number'])
@@ -319,7 +334,7 @@ def topic_view(request, board_name, post_number):
     board = get_object_or_404(Board, name=board_name)
     topic = get_object_or_404(Topic, on_board=board, post_number=post_number)
 
-    replies = Reply.objects.filter(on_topic=topic).order_by('post_number')
+    replies = list(Reply.objects.filter(on_topic=topic).order_by('post_number'))
 
     reply_forms = {topic.post_number: ReplyForm()}
     delete_forms = {topic.post_number: DeletionForm()}
@@ -367,11 +382,15 @@ def topic_view(request, board_name, post_number):
             if new_ban_form.is_valid():
                 success = try_ban(request, board, new_ban_form)
 
-                if not success:
+                if success:
+                    if new_ban_form.cleaned_data['post_number'] == topic.post_number:
+                        topic = get_object_or_404(Topic, pk=topic.pk)
+                    else:
+                        for i, reply in enumerate(replies):
+                            if new_ban_form.cleaned_data['post_number'] == reply.post_number:
+                                replies[i] = get_object_or_404(Reply, pk=reply.pk)
+                else:
                     return HttpResponseNotFound()
-                
-                if success and new_ban_form.cleaned_data['post_number'] == topic.post_number:
-                    return redirect(reverse(board_view_no_page, args=[board.name]))
             else:
                 if 'post_number' in new_ban_form.cleaned_data:
                     ban_forms[new_ban_form.cleaned_data['post_number']] = new_ban_form
