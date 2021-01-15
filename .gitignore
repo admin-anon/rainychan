@@ -1,3 +1,5 @@
 my_site/settings.py
 my_site.ini
 **/__pycache__
+boards/migrations/*
+!boards/migrations/__init__.py
