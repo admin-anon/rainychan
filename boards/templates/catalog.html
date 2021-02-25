@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% load boards_extras %}
+
+{% block title %}{{ board.name }} - Catalog{% endblock %}
+
+{% block content %}
+    <a href="{% url 'home_url' %}">Home</a> :: /{{ board.name }}/
+
+    <h2>/{{ board.name }}/</h2>
+
+    <p>{{ board.description }}</p>
+
+    <a href="{% url 'board_url_no_page' board.name %}">Return</a>
+
+    <div id="query-form-div">
+        <p>Search for a post: </p>
+        <form method="get">
+            <input type="text" name="query" {% if query %}value="{{ query }}"{% endif %}>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <table>
+        {% for three in topics %}
+            <tr>
+                {% for topic in three %}
+                    <td class="catalog-item">
+                        {% if topic.thumbnail %}
+                            <img src="{{ topic.thumbnail.url }}"></img>
+                        {% endif %}
+                        <p>
+                            R: {{ topic.replies|length }}<br>
+                            {{ topic.contents|shorten }}
+                        </p>
+                        <a href="{% url 'topic_url' board.name topic.post_number %}">Go to this post</a>
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+

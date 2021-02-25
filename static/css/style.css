@@ -14,6 +14,7 @@ body {
 }
 
 #boards-table {
+    table-layout: fixed;
     width: 100%;
     border-collapse: collapse;
 }
@@ -29,6 +30,7 @@ td {
 }
 
 #recent-posts-table {
+    table-layout: fixed;
     width: 100%;
     border-collapse: collapse;
 }
@@ -39,7 +41,7 @@ td {
 }
 
 #recent-posts-table td {
-    width: 33%;
+    width: 25%;
     height: 3em;
 }
 

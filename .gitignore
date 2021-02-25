@@ -1,3 +1,4 @@
+media/*
 my_site/settings.py
 my_site.ini
 **/__pycache__

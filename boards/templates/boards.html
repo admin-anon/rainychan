@@ -43,6 +43,9 @@
                     <a href="{% url 'board_url_no_page' post.on_board.name %}">/{{ post.on_board.name }}/</a>
                 </td>
                 <td>
+                    <a class="timestamp">{{ post.posted | date:"c" }}</a>
+                </td>
+                <td>
                     <a href={% if post|is_topic %}"{% url 'topic_url' post.on_board.name post.post_number %}"{% else %}"{% url 'topic_url' post.on_board.name post.on_topic.post_number %}#{{ post.post_number }}"{% endif %}>>>{{ post.post_number }}</a>
                 </td>
                 <td>

@@ -406,6 +406,31 @@ def topic_view(request, board_name, post_number):
 def banned_view(request):
     return render(request, 'banned.html')
 
+def catalog_view(request, board_name):
+    if is_banned(request) and not request.user.is_staff:
+        return redirect(reverse(banned_view))
+
+    board = get_object_or_404(Board, name=board_name)
+
+    posts_per_page = 20
+
+    all_topics = sort_topics(board)
+
+    query = None
+
+    if request.method == 'GET':
+        query = request.GET.get('query', None)
+        if query:
+            new_all_topics = []
+            for i, topic in enumerate(all_topics):
+                if query.upper() in topic.subject.upper() + topic.contents.upper():
+                    new_all_topics.append(all_topics[i])
+            all_topics = new_all_topics
+    
+    threes = [all_topics[i:min(len(all_topics), i + 3)] for i in range(0, len(all_topics), 3)]
+
+    return render(request, 'catalog.html', {'board': board, 'topics': threes})
+
 def handler404(request, *args, **kwargs):
     response = render(request, '404.html')
     response.status_code = 404

@@ -23,6 +23,7 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('boards/<str:board_name>/catalog/', views.catalog_view, name='board_catalog_url'),
     path('boards/<str:board_name>/<int:page>/', views.board_view, name='board_url_with_page'),
     path('boards/<str:board_name>/topic/<int:post_number>/', views.topic_view, name='topic_url'),
     path('boards/<str:board_name>/', views.board_view_no_page, name='board_url_no_page'),
