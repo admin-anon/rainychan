@@ -30,7 +30,7 @@
                             <img src="{{ topic.thumbnail.url }}"></img>
                         {% endif %}
                         <p>
-                            R: {{ topic.replies|length }}<br>
+                            R: {{ topic.replies.count }}<br>
                             {{ topic.contents|shorten }}
                         </p>
                         <a href="{% url 'topic_url' board.name topic.post_number %}">Go to this post</a>
